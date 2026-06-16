@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch - Movie Recommendation Engine</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <i class="fas fa-film"></i> CineMatch
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#movies" class="nav-link">Movies</a></li>
+                <li><a href="#recommendations" class="nav-link">Recommendations</a></li>
+                <li><a href="#profile" class="nav-link">Profile</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button class="btn-login" id="loginBtn">Login</button>
+                <button class="btn-signup" id="signupBtn">Sign Up</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Discover Your Next Favorite Movie</h1>
+            <p>AI-powered recommendations tailored to your taste</p>
+            <button class="btn-primary" id="getStartedBtn">Get Started</button>
+        </div>
+        <div class="hero-image">
+            <i class="fas fa-popcorn"></i>
+        </div>
+    </section>
+
+    <!-- Search & Filter Section -->
+    <section class="search-section">
+        <div class="container">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search movies...">
+                <button id="searchBtn"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="filter-chips">
+                <button class="chip active" data-genre="all">All</button>
+                <button class="chip" data-genre="action">Action</button>
+                <button class="chip" data-genre="comedy">Comedy</button>
+                <button class="chip" data-genre="drama">Drama</button>
+                <button class="chip" data-genre="horror">Horror</button>
+                <button class="chip" data-genre="sci-fi">Sci-Fi</button>
+                <button class="chip" data-genre="romance">Romance</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Movies Grid -->
+    <section id="movies" class="movies-section">
+        <div class="container">
+            <h2>Popular Movies</h2>
+            <div class="movies-grid" id="moviesGrid">
+                <!-- Movies will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Recommendations Section -->
+    <section id="recommendations" class="recommendations-section">
+        <div class="container">
+            <h2>Recommended For You</h2>
+            <div class="recommendations-grid" id="recommendationsGrid">
+                <!-- Recommendations will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Movie Detail Modal -->
+    <div id="movieModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-body">
+                <div class="movie-poster">
+                    <img id="modalPoster" src="" alt="poster">
+                </div>
+                <div class="movie-details">
+                    <h2 id="modalTitle"></h2>
+                    <div class="rating">
+                        <span id="modalRating"></span>
+                        <div class="stars" id="modalStars"></div>
+                    </div>
+                    <p id="modalDescription"></p>
+                    <div class="genres" id="modalGenres"></div>
+                    <div class="user-rating">
+                        <p>Rate this movie:</p>
+                        <div class="stars-input" id="userStars">
+                            <i class="fas fa-star" data-value="1"></i>
+                            <i class="fas fa-star" data-value="2"></i>
+                            <i class="fas fa-star" data-value="3"></i>
+                            <i class="fas fa-star" data-value="4"></i>
+                            <i class="fas fa-star" data-value="5"></i>
+                        </div>
+                        <button class="btn-primary" id="submitRatingBtn">Submit Rating</button>
+                    </div>
+                    <button class="btn-secondary" id="addWatchlistBtn">
+                        <i class="fas fa-bookmark"></i> Add to Watchlist
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content auth-modal">
+            <span class="close">&times;</span>
+            <h2>Login</h2>
+            <form id="loginForm">
+                <input type="email" placeholder="Email" required>
+                <input type="password" placeholder="Password" required>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content auth-modal">
+            <span class="close">&times;</span>
+            <h2>Sign Up</h2>
+            <form id="signupForm">
+                <input type="text" placeholder="Full Name" required>
+                <input type="email" placeholder="Email" required>
+                <input type="password" placeholder="Password" required>
+                <input type="password" placeholder="Confirm Password" required>
+                <button type="submit" class="btn-primary">Sign Up</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 CineMatch. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+
+    <!-- Sample Data & Recommendation System -->
+    <script>
+        // Movie Database with Genres
+        const sampleMovies = [
+            { id: 1, title: 'Inception', description: 'A mind-bending thriller about dreams and reality.', release_year: '2010', director: 'Christopher Nolan', poster: 'https://m.media-amazon.com/images/I/912AErFSBHL._AC_UF894,1000_QL80_.jpg', average_rating: 8.8, genres: ['Action', 'Sci-Fi', 'Thriller'] },
+            { id: 2, title: 'The Dark Knight', description: 'Batman faces his greatest challenge against the Joker.', release_year: '2008', director: 'Christopher Nolan', poster: 'https://m.media-amazon.com/images/I/81PGnTe44yL._AC_UF894,1000_QL80_.jpg', average_rating: 9.0, genres: ['Action', 'Crime', 'Drama'] },
+            { id: 3, title: 'Pulp Fiction', description: 'The lives of two mob hitmen, a boxer, a gangster and his wife intertwine in four tales of violence.', release_year: '1994', director: 'Quentin Tarantino', poster: 'https://m.media-amazon.com/images/I/81z1A2-9a-L._AC_UF894,1000_QL80_.jpg', average_rating: 8.9, genres: ['Crime', 'Drama'] },
+            { id: 4, title: 'Forrest Gump', description: 'The presidencies of Kennedy and Johnson unfold from an Alabama man with an IQ of 75.', release_year: '1994', director: 'Robert Zemeckis', poster: 'https://m.media-amazon.com/images/I/71h+dO322tL._AC_UF894,1000_QL80_.jpg', average_rating: 8.8, genres: ['Comedy', 'Drama', 'Romance'] },
+            { id: 5, title: 'The Matrix', description: 'A computer hacker learns the true nature of his reality.', release_year: '1999', director: 'Wachowski Sisters', poster: 'https://m.media-amazon.com/images/I/71P05l-bF+L._AC_UF894,1000_QL80_.jpg', average_rating: 8.7, genres: ['Action', 'Sci-Fi'] },
+            { id: 6, title: 'The Godfather', description: 'An organized crime dynasty transfers control to its reluctant son.', release_year: '1972', director: 'Francis Ford Coppola', poster: 'https://m.media-amazon.com/images/I/714ZOEiVN2L._AC_UF894,1000_QL80_.jpg', average_rating: 9.2, genres: ['Crime', 'Drama'] },
+            { id: 7, title: 'The Shawshank Redemption', description: 'Two imprisoned men find solace and redemption through acts of decency.', release_year: '1994', director: 'Frank Darabont', poster: 'https://m.media-amazon.com/images/I/71715eI-F-L._AC_UF894,1000_QL80_.jpg', average_rating: 9.3, genres: ['Drama'] },
+            { id: 8, title: 'Fight Club', description: 'An office worker and a soap maker form an underground fight club.', release_year: '1999', director: 'David Fincher', poster: 'https://m.media-amazon.com/images/I/81D+KJkO4SL._AC_UF894,1000_QL80_.jpg', average_rating: 8.8, genres: ['Drama'] },
+            { id: 9, title: 'Goodfellas', description: 'The life of Henry Hill in the mob, covering his relationships with mob partners.', release_year: '1990', director: 'Martin Scorsese', poster: 'https://m.media-amazon.com/images/I/71w+4a54nLL._AC_UF894,1000_QL80_.jpg', average_rating: 8.7, genres: ['Biography', 'Crime', 'Drama'] },
+            { id: 10, title: 'The Lord of the Rings', description: 'A Hobbit embarks on a journey to destroy the powerful One Ring.', release_year: '2001', director: 'Peter Jackson', poster: 'https://m.media-amazon.com/images/I/81EBp0vOZZL._AC_UF894,1000_QL80_.jpg', average_rating: 8.8, genres: ['Action', 'Adventure', 'Drama'] },
+            { id: 11, title: 'Parasite', description: 'A symbiotic relationship between a wealthy family and a destitute clan.', release_year: '2019', director: 'Bong Joon Ho', poster: 'https://m.media-amazon.com/images/I/91Sru-M1i0L._AC_UF894,1000_QL80_.jpg', average_rating: 8.6, genres: ['Comedy', 'Drama', 'Thriller'] },
+            { id: 12, title: 'Interstellar', description: 'A team of explorers travel through a wormhole to ensure humanity\'s survival.', release_year: '2014', director: 'Christopher Nolan', poster: 'https://m.media-amazon.com/images/I/91kFYg4fX3L._AC_UF894,1000_QL80_.jpg', average_rating: 8.6, genres: ['Adventure', 'Drama', 'Sci-Fi'] },
+            { id: 13, title: 'The Silence of the Lambs', description: 'An F.B.I. cadet receives help from a cannibal killer to catch another serial killer.', release_year: '1991', director: 'Jonathan Demme', poster: 'https://m.media-amazon.com/images/I/81SVDO6s0bL._AC_UF894,1000_QL80_.jpg', average_rating: 8.6, genres: ['Crime', 'Drama', 'Thriller'] },
+            { id: 14, title: 'Saving Private Ryan', description: 'U.S. soldiers go behind enemy lines to retrieve a paratrooper.', release_year: '1998', director: 'Steven Spielberg', poster: 'https://m.media-amazon.com/images/I/812l-0r-yIL._AC_UF894,1000_QL80_.jpg', average_rating: 8.6, genres: ['Drama', 'War'] },
+            { id: 15, title: 'Gladiator', description: 'A Roman General sets out to exact vengeance against the corrupt emperor.', release_year: '2000', director: 'Ridley Scott', poster: 'https://m.media-amazon.com/images/I/71pA0e-A-ML._AC_UF894,1000_QL80_.jpg', average_rating: 8.5, genres: ['Action', 'Adventure', 'Drama'] },
+            { id: 16, title: 'Joker', description: 'A mentally troubled comedian Arthur Fleck embarks on a downward spiral.', release_year: '2019', director: 'Todd Phillips', poster: 'https://m.media-amazon.com/images/I/71H4e7aP6FL._AC_UF894,1000_QL80_.jpg', average_rating: 8.4, genres: ['Crime', 'Drama', 'Thriller'] },
+            { id: 17, title: 'Whiplash', description: 'A young drummer is mentored by an instructor who stops at nothing.', release_year: '2014', director: 'Damien Chazelle', poster: 'https://m.media-amazon.com/images/I/81mD+2v-a-L._AC_UF894,1000_QL80_.jpg', average_rating: 8.5, genres: ['Drama', 'Music'] },
+            { id: 18, title: 'The Departed', description: 'An undercover cop and a mole attempt to identify each other.', release_year: '2006', director: 'Martin Scorsese', poster: 'https://m.media-amazon.com/images/I/81mXw0w-p7L._AC_UF894,1000_QL80_.jpg', average_rating: 8.5, genres: ['Crime', 'Drama', 'Thriller'] },
+            { id: 19, title: 'The Prestige', description: 'Two stage magicians engage in a battle to create the ultimate illusion.', release_year: '2006', director: 'Christopher Nolan', poster: 'https://m.media-amazon.com/images/I/81n5-I+sTFL._AC_UF894,1000_QL80_.jpg', average_rating: 8.5, genres: ['Drama', 'Mystery', 'Sci-Fi'] },
+            { id: 20, title: 'Avengers: Endgame', description: 'The remaining Avengers figure out how to bring back their vanquished allies.', release_year: '2019', director: 'Anthony Russo, Joe Russo', poster: 'https://m.media-amazon.com/images/I/81ExhpBEbHL._AC_UF894,1000_QL80_.jpg', average_rating: 8.4, genres: ['Action', 'Adventure', 'Drama'] }
+        ];
+
+        // User ratings storage (localStorage)
+        let userRatings = JSON.parse(localStorage.getItem('userRatings')) || {};
+        let currentUser = localStorage.getItem('currentUser');
+
+        // COLLABORATIVE FILTERING ENGINE
+        class RecommendationEngine {
+            constructor(movies, userRatings) {
+                this.movies = movies;
+                this.userRatings = userRatings;
+            }
+
+            // Collaborative Filtering: Find similar users based on rating patterns
+            findSimilarUsers(userId) {
+                const userVector = this.userRatings[userId] || {};
+                const similarUsers = [];
+
+                for (let otherUserId in this.userRatings) {
+                    if (otherUserId === userId) continue;
+
+                    const otherVector = this.userRatings[otherUserId];
+                    const similarity = this.calculateCosineSimilarity(userVector, otherVector);
+
+                    if (similarity > 0.5) {
+                        similarUsers.push({ userId: otherUserId, similarity });
+                    }
+                }
+
+                return similarUsers.sort((a, b) => b.similarity - a.similarity);
+            }
+
+            // Calculate cosine similarity between two rating vectors
+            calculateCosineSimilarity(ratings1, ratings2) {
+                const keys = new Set([...Object.keys(ratings1), ...Object.keys(ratings2)]);
+                let dotProduct = 0, magnitude1 = 0, magnitude2 = 0;
+
+                for (let key of keys) {
+                    const r1 = ratings1[key] || 0;
+                    const r2 = ratings2[key] || 0;
+                    dotProduct += r1 * r2;
+                    magnitude1 += r1 * r1;
+                    magnitude2 += r2 * r2;
+                }
+
+                if (magnitude1 === 0 || magnitude2 === 0) return 0;
+                return dotProduct / (Math.sqrt(magnitude1) * Math.sqrt(magnitude2));
+            }
+
+            // Content-Based Filtering: Find movies with similar genres
+            getContentBasedRecommendations(userId, limit = 5) {
+                const userRated = this.userRatings[userId] || {};
+                const highRatedGenres = {};
+
+                // Find genres of highly rated movies
+                for (let movieId in userRated) {
+                    if (userRated[movieId] >= 4) {
+                        const movie = this.movies.find(m => m.id == movieId);
+                        if (movie) {
+                            movie.genres.forEach(genre => {
+                                highRatedGenres[genre] = (highRatedGenres[genre] || 0) + 1;
+                            });
+                        }
+                    }
+                }
+
+                // Score unrated movies based on genre similarity
+                const recommendations = this.movies
+                    .filter(m => !userRated[m.id])
+                    .map(movie => {
+                        let score = 0;
+                        movie.genres.forEach(genre => {
+                            score += highRatedGenres[genre] || 0;
+                        });
+                        return { movie, score: score + movie.average_rating };
+                    })
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, limit)
+                    .map(r => r.movie);
+
+                return recommendations;
+            }
+
+            // Collaborative Filtering: Predict ratings based on similar users
+            getCollaborativeRecommendations(userId, limit = 5) {
+                const similarUsers = this.findSimilarUsers(userId);
+                const userRated = this.userRatings[userId] || {};
+                const predictions = {};
+
+                // Aggregate ratings from similar users
+                for (let similar of similarUsers) {
+                    const otherUserRatings = this.userRatings[similar.userId];
+
+                    for (let movieId in otherUserRatings) {
+                        if (!userRated[movieId]) {
+                            if (!predictions[movieId]) {
+                                predictions[movieId] = { sum: 0, count: 0 };
+                            }
+                            predictions[movieId].sum += otherUserRatings[movieId] * similar.similarity;
+                            predictions[movieId].count += similar.similarity;
+                        }
+                    }
+                }
+
+                // Convert predictions to movies
+                const recommendations = Object.entries(predictions)
+                    .map(([movieId, pred]) => {
+                        const predictedRating = pred.sum / pred.count;
+                        const movie = this.movies.find(m => m.id == movieId);
+                        return { movie, predictedRating };
+                    })
+                    .sort((a, b) => b.predictedRating - a.predictedRating)
+                    .slice(0, limit)
+                    .map(r => r.movie);
+
+                return recommendations;
+            }
+
+            // Hybrid recommendation combining both approaches
+            getHybridRecommendations(userId, limit = 5) {
+                const contentBased = this.getContentBasedRecommendations(userId, 10);
+                const collaborative = this.getCollaborativeRecommendations(userId, 10);
+
+                const combined = new Map();
+                contentBased.forEach((movie, idx) => {
+                    combined.set(movie.id, (combined.get(movie.id) || 0) + (10 - idx));
+                });
+                collaborative.forEach((movie, idx) => {
+                    combined.set(movie.id, (combined.get(movie.id) || 0) + (10 - idx));
+                });
+
+                return Array.from(combined.entries())
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, limit)
+                    .map(([movieId]) => this.movies.find(m => m.id == movieId));
+            }
+        }
+
+        const recommendationEngine = new RecommendationEngine(sampleMovies, userRatings);
+
+        // Render movies in grid
+        function renderMovies(movies) {
+            const moviesGrid = document.getElementById('moviesGrid');
+            moviesGrid.innerHTML = '';
+
+            movies.forEach((movie) => {
+                const movieElement = document.createElement('div');
+                movieElement.classList.add('movie-card');
+                movieElement.dataset.id = movie.id;
+
+                const starsHTML = generateStars(Math.round(movie.average_rating));
+
+                movieElement.innerHTML = `
+                    <div class="movie-poster">
+                        <img src="${movie.poster}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/200x300?text=${encodeURIComponent(movie.title)}'">
+                        <div class="movie-card-overlay">
+                            <button onclick="viewMovieDetails(${movie.id})" class="btn-details">View Details</button>
+                        </div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">${movie.title}</h3>
+                        <p class="movie-year">${movie.release_year}</p>
+                        <div class="movie-rating">
+                            <div class="stars">${starsHTML}</div>
+                            <span class="movie-rating-value">${movie.average_rating.toFixed(1)}</span>
+                        </div>
+                        <div class="movie-genres">
+                            ${movie.genres.map(g => `<span class="genre-tag">${g}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+
+                moviesGrid.appendChild(movieElement);
+            });
+        }
+
+        // Generate star HTML
+        function generateStars(rating) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    html += '<i class="fas fa-star"></i>';
+                } else {
+                    html += '<i class="far fa-star"></i>';
+                }
+            }
+            return html;
+        }
+
+        // View movie details
+        function viewMovieDetails(movieId) {
+            const movie = sampleMovies.find(m => m.id == movieId);
+            if (!movie) return;
+
+            document.getElementById('modalPoster').src = movie.poster;
+            document.getElementById('modalTitle').textContent = movie.title;
+            document.getElementById('modalRating').textContent = `${movie.average_rating.toFixed(1)}/10`;
+            document.getElementById('modalDescription').textContent = movie.description;
+            document.getElementById('modalStars').innerHTML = generateStars(Math.round(movie.average_rating));
+            document.getElementById('modalGenres').innerHTML = movie.genres
+                .map(g => `<span class="genre-tag">${g}</span>`)
+                .join('');
+
+            // Update rating stars based on user's previous rating
+            const userRatingsForMovie = userRatings[currentUser] || {};
+            const userRating = userRatingsForMovie[movieId] || 0;
+            updateUserStars(userRating);
+
+            document.getElementById('submitRatingBtn').onclick = () => submitRating(movieId);
+            document.getElementById('movieModal').classList.add('show');
+        }
+
+        // Update user rating stars
+        function updateUserStars(rating) {
+            document.querySelectorAll('#userStars i').forEach((star, idx) => {
+                if (idx < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        // Handle user rating
+        let selectedRating = 0;
+        document.getElementById('userStars').addEventListener('click', (e) => {
+            if (e.target.tagName === 'I') {
+                selectedRating = Array.from(e.target.parentElement.children).indexOf(e.target) + 1;
+                updateUserStars(selectedRating);
+            }
+        });
+
+        // Submit rating
+        function submitRating(movieId) {
+            if (!currentUser) {
+                alert('Please login to rate movies');
+                return;
+            }
+
+            if (!selectedRating) {
+                alert('Please select a rating');
+                return;
+            }
+
+            if (!userRatings[currentUser]) {
+                userRatings[currentUser] = {};
+            }
+
+            userRatings[currentUser][movieId] = selectedRating;
+            localStorage.setItem('userRatings', JSON.stringify(userRatings));
+
+            alert('Rating submitted!');
+            selectedRating = 0;
+            document.getElementById('movieModal').classList.remove('show');
+            loadRecommendations();
+        }
+
+        // Load recommendations
+        function loadRecommendations() {
+            if (!currentUser || Object.keys(userRatings[currentUser] || {}).length === 0) {
+                document.getElementById('recommendationsGrid').innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem;">Rate some movies to get personalized recommendations!</p>';
+                return;
+            }
+
+            const recommendations = recommendationEngine.getHybridRecommendations(currentUser, 10);
+            const grid = document.getElementById('recommendationsGrid');
+            grid.innerHTML = '';
+
+            if (recommendations.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem;">No recommendations at this time.</p>';
+                return;
+            }
+
+            recommendations.forEach(movie => {
+                const movieElement = document.createElement('div');
+                movieElement.classList.add('movie-card');
+                movieElement.innerHTML = `
+                    <div class="movie-poster">
+                        <img src="${movie.poster}" alt="${movie.title}">
+                        <div class="movie-card-overlay">
+                            <button onclick="viewMovieDetails(${movie.id})" class="btn-details">View Details</button>
+                        </div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">${movie.title}</h3>
+                        <p class="movie-year">${movie.release_year}</p>
+                        <div class="movie-rating">
+                            <div class="stars">${generateStars(Math.round(movie.average_rating))}</div>
+                            <span class="movie-rating-value">${movie.average_rating.toFixed(1)}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(movieElement);
+            });
+        }
+
+        // Close modal
+        document.querySelectorAll('.close').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.target.closest('.modal').classList.remove('show');
+            });
+        });
+
+        // Genre filtering
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                e.target.classList.add('active');
+
+                const genre = e.target.dataset.genre;
+                if (genre === 'all') {
+                    renderMovies(sampleMovies);
+                } else {
+                    const filtered = sampleMovies.filter(m => m.genres.includes(genre.charAt(0).toUpperCase() + genre.slice(1)));
+                    renderMovies(filtered);
+                }
+            });
+        });
+
+        // Search functionality
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = sampleMovies.filter(m =>
+                m.title.toLowerCase().includes(query) ||
+                m.description.toLowerCase().includes(query)
+            );
+            renderMovies(filtered);
+        });
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            currentUser = currentUser || 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('currentUser', currentUser);
+            renderMovies(sampleMovies);
+            loadRecommendations();
+        });
+    </script>
+</body>
+
+</html>
